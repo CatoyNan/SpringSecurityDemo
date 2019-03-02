@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://47.106.221.243:3306/equipmentReservationSystem?characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+  thymeleaf:
+    cache: false
+    check-template: false
+    mode: LEGACYHTML5
