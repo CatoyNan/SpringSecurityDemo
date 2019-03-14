@@ -1,8 +1,11 @@
 package top.catoy.demo.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import top.catoy.demo.bean.User;
 
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -11,8 +14,23 @@ import java.util.*;
  * @create: 2019-02-28 12:52
  **/
 @RestController
+@RequestMapping(value = "/user")
 public class UserController {
-    @RequestMapping(value = "/user",method = RequestMethod.GET)
+    @PostMapping
+    public User create(@Valid @RequestBody User user, BindingResult errors){
+        if(errors.hasErrors()){
+            errors.getAllErrors().stream().forEach(error->System.out.println(error.getDefaultMessage()));
+        }
+        System.out.println(user.getId());
+        System.out.println(user.getPassword());
+        System.out.println(user.getUserName());
+        System.out.println(user.getBirthday());
+        user.setId(1);
+        return user;
+    }
+
+    @GetMapping
+    @JsonView(User.UserSimpleView.class)
     public List<User> query(User u) {
         List<User> list = new ArrayList<User>();
         list.add(u);
@@ -21,10 +39,11 @@ public class UserController {
         return  list;
     }
 
-    @RequestMapping(value = "/user/{id}",method = RequestMethod.GET)
+    @GetMapping(value = "/{id:\\d+}")
+    @JsonView(User.UserDetailView.class)
     public User getInfo(@PathVariable(name = "id") String id){
         User user = new User();
-        user.setName("tom");
+        user.setUserName("tom");
         return user;
     }
 

@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Date;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class DemoApplicationTests {
@@ -30,20 +32,49 @@ public class DemoApplicationTests {
 
     @Test
     public void whenQuerySuccess() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/user")
-                .param("username","jojo")
+       String result =  mockMvc.perform(MockMvcRequestBuilders.get("/user")
+                .param("userName","jojo")
                 .param("password","123")
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3))
+               .andReturn().getResponse().getContentAsString();
+       System.out.println(result);
     }
 
     @Test
     public void whenGenInfoSuccess() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/1")
+        String result = mockMvc.perform(MockMvcRequestBuilders.get("/user/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("tom"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("tom"))
+                .andReturn().getResponse().getContentAsString();
+        System.out.println(result);
+    }
+
+    /**
+     * 测试id只能为数字若不是数字返回4**状态码
+     * @throws Exception
+     */
+    @Test
+    public void whenGetInfoFail() throws Exception{
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/a")
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    public void whenCreateSuccess() throws Exception{
+        Date date = new Date();
+        System.out.println(date.getTime());
+        String content = "{\"userName\":\"tom\",\"password\":null,\"birthday\":"+date.getTime()+"}";
+        String result = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(content))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
+                .andReturn().getResponse().getContentAsString();
+        System.out.println(result);
     }
 
 
